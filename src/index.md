@@ -353,7 +353,7 @@ const yearCount = (licensesByYear()).filter((entry) => entry.year <= yearOfInter
 Plot.plot({
   x: {padding: 0.1, tickFormat: (d, i) => {
     if (yearCount.length > 20) {
-      return i % 5 === 0 ? d.toString() : ""
+      return i % 10 === 0 ? d.toString() : ""
     } else {
       return d.toString()
     }

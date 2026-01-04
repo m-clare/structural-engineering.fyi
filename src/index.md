@@ -31,25 +31,29 @@ const stateReqs = {
   <h2>with Structural Engineering Licenses*</h2>
 </div>
 
-<div class="note">*Individuals licensed as a "structural engineer". The SE license requires <a href="https://ncees.org/exams/pe-exam/cbt-structural">additional depth and breadth exams</a> in gravity and lateral design for buildings and bridges (currently 21 hours of additional computer-based testing).</div>
+<div class="note">*Individuals licensed as a "structural engineer". The SE license requires <a href="https://ncees.org/exams/pe-exam/cbt-structural">additional depth and breadth exams</a> in gravity and lateral design for buildings and bridges (currently 21 hours of additional computer-based testing that is beyond  what is required for a professional engineering license).</div>
 
 ## Motivation
-This website provides insight into the state of licensure within the profession of structural engineering. The "professional engineer" license has been accepted for decades in many states as the standard for the design of buildings and bridges. 
+This website provides insight into the status of licensure within the profession of structural engineering. 
 
-However, several professional organizations and governing bodies have pushed for further adopting of advanced qualification based on the structural engineering exam, now confusingly called the PE Structural (engineers are currently qualified to practice structural engineering in 30 states from taking the PE Civil: Structural exam, a single 8 hour test). To my knowledge, no one has compared license data across all the ten SE licensed states to determine how many practicing SEs there are and what the trends have been in licensure over the past 60 years. I previously took a look at data in a [few states](https://mclare.blog/posts/is-the-structural-engineering-profession-growing/) where it was easy to get licensure data, but decided to revisit this idea with more refined data processing and analysis.
+The "professional engineer" license has been accepted for decades in many U.S. states as the standard for the design of buildings and bridges. Engineers are currently qualified to practice structural engineering in 30 states after passing the PE Civil Exam, a single 8 hour test. However, several professional organizations and governing bodies are pushing for further adoption of advanced qualification based on the "structural engineering" exam. This is confusingly called the "PE" Structural Exam, and requires 21 hours of testing, in addition to the 8 hour PE exam, and specific experience requirements.
+
+There are ten states where the SE license is required in order to design some ("partial practice") or all ("full practice") buildings and bridges. In the maps below there are additional designations that determine if an individual can use the title "structural engineer", but they do not impact an individual's ability to practice structural engineering with only a PE license. 
+
+To my knowledge, no one has compared license data across all of the ten SE license states to determine how many practicing SEs there are and what the trends over time have been in licensure over the past 60 years. I previously took a look at data in a [few states](https://mclare.blog/posts/is-the-structural-engineering-profession-growing/) where it was easy to get licensure data, but decided to revisit this idea with more refined data processing and analysis.
 
 ### Active SE Licenses By State 
 ```js
 stateChoropleth(licenseStateCounts, states)
 ```
 
-There are ${activeLicenseCount} unique licensed structural engineers, who maintain ${totalLicenseCount} active licenses across 10 states. States denoted with a "Partial Practice Act", or "Full Practice Act" are where the licensure data has been gathered from (see [Other Notes](#other-notes)). 
+There are ${activeLicenseCount} unique licensed structural engineers, who maintain ${totalLicenseCount} active licenses across 10 states. More information on how I gathered this data is in [Other Notes](#other-notes). 
 
 
 ## Key Findings
 Here are some key takeaways from a deep dive into the data.
 
-- __At least 5% of active practicing SE licensed engineers have never taken the advanced qualification exam.__ This is due to legislation in [Utah in 2008](https://trackbill.com/bill/utah-senate-bill-200-professional-engineers-licensing-amendments/380377/) and legislation in [Georgia in 2020](https://seaog.org/news.php?id=13) allowing engineers to apply for licensure based on experience rather than test outcomes.  While they may not be able to get comity in other states at this point, they are still qualified SEs according to the licensing board. After noticing anomolous peaks in the data from looking at license statistics by state, I was able to find the supporting legislation changes.
+- __At least 5% of active practicing SE licensed engineers have never taken the SE exam.__ These individuals never took the SE exam due to legislation in [Utah in 2008](https://trackbill.com/bill/utah-senate-bill-200-professional-engineers-licensing-amendments/380377/) and legislation in [Georgia in 2020](https://seaog.org/news.php?id=13) allowing engineers to apply for licensure based on experience rather than test outcomes.  While they may not be able to get comity in other states at this point, they are still qualified SEs according to the licensing board. After noticing anomolous peaks in the data from looking at license statistics by state, I was able to find the supporting legislation changes.
 
 ```js
 const statusColors = ["#377eb8", "#e41a1c", "#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628","#f781bf","#999999"]
@@ -91,9 +95,9 @@ display(StackedBarChart(filledGAData, {
 }));
 ```
 
-- __28% of active licensed SEs are licensed only in Hawaii.__ I believe under old testing guidelines, Hawaii granted licenses to individuals if they had passed the first of two parts of the old exam. It's unclear if today someone who qualified this way still needs to make this distinction. Anecdotally, I remember a supervising engineer early in my career complaining that he had to denote he'd only passed the SE I in Hawaii on his business cards. The high proportion of licensed individuals in Hawaii is also likely due to their lack of continuing education requirements (Illinois, the only other full practice state, does require continuing education).
+- __28% of active licensed SEs are licensed only in Hawaii.__ I believe under old testing guidelines, Hawaii granted licenses to individuals if they had passed portions of an old SE exam that is no longer used. It's unclear if today someone who qualified this way still needs to make this distinction. Anecdotally, I remember a supervising engineer early in my career complaining that he had to denote he'd only passed the SE-1 in Hawaii on his business cards. The high proportion of licensed individuals in Hawaii is also likely due to their lack of continuing education requirements (Illinois, the only other full practice state, does require continuing education).
 
-- __The current average (and median) "age" of an SE license is 15 years old.__ Assuming that most licensed individuals are passing the exam in their late 20s/early 30s after acquiring the required years of experience, this would make the average license holder around 45 years old. There have been two dips in the average age thanks to the grandfathering clauses mentioned above, but in general, the average age has only been increasing (which indicates that there is no steady state of people exiting and entering the profession).
+- __The current average (and median) "age" of an SE license is 15 years old.__ Assuming that most licensed individuals are passing the exam in their late 20s/early 30s after acquiring the required years of experience, this would make the average license holder around 45 years old. There have been two dips in the average age thanks to the grandfathering clauses mentioned above, but in general, the average age has only been increasing. That the average is changing (and increasing) indicates that there is no steady state of people exiting and entering the profession.
 
 ### Number of Active Licensed Professionals Over Time and Average "Age" of a License
 
@@ -144,7 +148,9 @@ const stats = getStats(licenseAge)
 }))}
 </div>
 
-- The data quality around licensure expiration is not great (and probably shouldn't be trusted for licenses prior to 1990), but I was curious if there are any visible trends in how many years a license holder maintains at least one license before letting it lapse. Prior to 2000, this seemed to follow a bell curve, but in more recent years, the distribution has skewed right, with __more people failing to renew any SE license after less than 15 years of maintaining it.__ This may also be due to some of those single license holders unable to achieve comity without additional (21 hour) testing choosing not to renew as well.
+- The data quality around licensure expiration is not great (and probably shouldn't be trusted for licenses prior to 1990), but I was curious if there are any visible trends in how many years a license holder maintains at least one license before letting it lapse. If you select the year 2000 in the plot below, that will show that at this point in time there were approximately 1,606 total (summing all the bars below) SE license holders who had allowed all their SE licenses to lapse. Each bar represents the number of years a license holder maintained at least one SE license. For example, 25 SE holders allowed their license to lapse after 4 years before the year 2000. A possible interpretation of this is that those 25 individuals exited the profession.
+
+  Prior to 2000, the distribution of years of experience in the profession as a licensed SE followed a normal distribution. In more recent years, the distribution has skewed right, with __more people failing to renew any SE license after less than 15 years of maintaining it.__ A possible explanation is that more people are leaving the profession well before retirement age.
 
 ### Years of Experience Before Non-renewal of Any SE License
 
@@ -347,7 +353,7 @@ function licensesByYear() {
 }
 const yearCount = (licensesByYear()).filter((entry) => entry.year <= yearOfInterest)
 ```
-<div class="note">This plot includes active licenses based on the year of interest, i.e. an individual's latest expired license date is considered for adding and removing counts from the plot.</div>
+<div class="note">This plot includes active licenses based on the year of interest. For example, if we select the year 2000 below, there were approximately 300 licensed individuals who received their first license in 1990 and were still maintaining at least one SE license in the year 2000.</div>
 
 ```js
 Plot.plot({

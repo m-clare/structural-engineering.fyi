@@ -422,17 +422,21 @@ This site utilizes data from the licensure board for the following ten states (w
 - [Utah](https://dopl.utah.gov/engineering/)
 - [Washington](https://brpels.wa.gov/)
 
-There is significant discrepancy in what data each state provides for each license holder. Most states include the following fields (used to analyze the data and generate the plots above):
+There are discrepancies in the data fields each state provides for a license. *Most* states include the following fields (used to analyze the data and generate the plots above):
 - date of licensure 
 - license validity (active/non-active)
 - license expiration date 
 - state of origin for licensee 
 
-Exceptions:
-- Nevada - no date of licensure (cannot use NV only licenses in cumulative count graphic, or Licenses By State)
+#### Exceptions:
+- Nevada - no dates of licensure (cannot use NV only licenses in cumulative count graphic, or Licenses By State)
 - Hawaii - no state of origin (cannot include HI only licensees in state of origin graphic)
 
 Passing the 21 hour exam (broken into 4 parts) does not automatically qualify an indvidual to be licensed in one of the ten Partial/Full Practice states. Some states require practicing as a PE for X number of years under a licensed SE before sitting the exam. Others require proof of significant structural experience (down to the seismic design category of a project) to qualify.
+
+#### Known Data Quality Issues
+- Illinois has a default license date of 1997-01-01 for licenses where it lacks effective/expiration dates (all show up as "inactive")
+- Just about state has a few licenses that are marked as "active" but may lack licensure dates/expiration dates, probably from bad record keeping
 
 ## Disclaimer
 

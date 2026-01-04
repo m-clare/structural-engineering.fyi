@@ -19,8 +19,12 @@ export default {
   // ],
 
   // Content to add to the head of the page, e.g. for a favicon:
-  head: '<link rel="icon" href="observable.png" type="image/png" sizes="32x32">',
-
+  head: `<link rel="icon" href="observable.png" type="image/png" sizes="32x32">
+           <script async src="https://plausible.io/js/pa-jSnKFx2-Wo7Kh6Go2UafI.js" ></script>
+           <script>
+           window.plausible=window.plausible||function(){(plausible.q = plausible.q || []).push(arguments)},plausible.init=plausible.init||function(i){plausible.o = i || {}};
+           plausible.init()
+           </script>`,
   // The path to the source root.
   root: "src",
 

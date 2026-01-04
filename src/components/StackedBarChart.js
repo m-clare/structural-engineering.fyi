@@ -8,7 +8,7 @@ export function StackedBarChart(
     z = (d) => d.status, // stack key accessor (status or state)
     xLabel = "Year",
     yLabel = "Count",
-    width = 2400,
+    width = 1200,
     height = 500,
     marginTop = 10,
     marginRight = 10,
@@ -27,10 +27,6 @@ export function StackedBarChart(
       const item = D.get(key);
       return item ? y(item) : 0; // Call y() function on the item
     })(d3.index(data, x, z));
-  // const series = d3
-  //     .stack()
-  //     .keys(stackKeys)
-  // .value(([, D], key) => D.get(key)?.[y.name] || 0)(d3.index(data, x, z));
   const keyOrder = series.map((d) => d.key);
 
   const xScale = d3
@@ -45,13 +41,10 @@ export function StackedBarChart(
   const color = d3
     .scaleOrdinal()
     .domain(keyOrder)
-    .range(colors[series.length] || colors[3])
+    .range(colors.slice(0, series.length))
     .unknown("#ccc");
 
   const formatValue = (val) => (isNaN(val) ? "N/A" : val.toLocaleString("en"));
-
-  console.log(stackKeys);
-  console.log(keyOrder);
 
   // Create the SVG container.
   const svg = d3
@@ -80,11 +73,20 @@ export function StackedBarChart(
       return `${d.data[0]} ${d.key}\n${formatValue(y(item))}`;
     });
   // Append the horizontal axis.
+
+  const xAxis = d3
+    .axisBottom(xScale)
+    .tickValues(
+      d3
+        .ticks(...d3.extent(xScale.domain()), width / 40)
+        .filter((v) => xScale(v) !== undefined)
+    )
+    .tickSizeOuter(0);
   svg
     .append("g")
     .attr("transform", `translate(0,${height - marginBottom})`)
-    .call(d3.axisBottom(xScale).tickSizeOuter(0))
-    .call((g) => g.selectAll(".domain").remove());
+    .call(xAxis);
+
   // Append the vertical axis.
   svg
     .append("g")

@@ -2,7 +2,7 @@ import * as d3 from "npm:d3";
 
 export function UpsetPlot(data) {
   const height = 600;
-  const margin = { top: 20, right: 20, bottom: 320, left: 100 };
+  const margin = { top: 20, right: 20, bottom: 320, left: 40 };
   const dotSize = 10;
   const dotSpacing = 30;
   const barWidth = 25;
@@ -36,7 +36,7 @@ export function UpsetPlot(data) {
     .attr("y", (d) => chartHeight - barScale(d.size))
     .attr("width", barWidth)
     .attr("height", (d) => barScale(d.size))
-    .attr("fill", "#4299e1");
+    .attr("fill", "steelblue");
 
   // Bar labels
   bars
@@ -72,7 +72,7 @@ export function UpsetPlot(data) {
         .attr("y1", chartHeight + 30 + dot.index * dotSpacing)
         .attr("x2", barWidth / 2)
         .attr("y2", chartHeight + 30 + nextDot.index * dotSpacing)
-        .attr("stroke", "#4299e1")
+        .attr("stroke", "steelblue")
         .attr("stroke-width", 1);
     });
 
@@ -84,7 +84,7 @@ export function UpsetPlot(data) {
         .attr("cx", barWidth / 2)
         .attr("cy", chartHeight + 30 + j * dotSpacing)
         .attr("r", dotSize)
-        .attr("fill", isActive ? "#4299e1" : "#e2e8f0");
+        .attr("fill", isActive ? "steelblue" : "#e2e8f0");
     });
   });
 

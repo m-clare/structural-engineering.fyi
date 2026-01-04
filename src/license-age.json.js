@@ -1,4 +1,4 @@
-const apiUrl = "http://localhost:8000/state-by-origin";
+const apiUrl = "http://localhost:8000/license-age";
 
 const licenses = await fetch(apiUrl).then((response) => {
   if (!response.ok) {

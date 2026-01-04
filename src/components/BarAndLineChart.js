@@ -69,10 +69,7 @@ export function BarAndLineChart(
   const yAxis = d3.axisLeft(yScale).ticks(height / 60, yFormat);
 
   // Hardcoded bar scale
-  const y2Domain = [
-    0,
-    d3.max(data.filter((d) => d.status === "Active").map((d) => d.count)),
-  ];
+  const y2Domain = [0, d3.max(data.map((d) => d.count))];
   const y2Type = d3.scaleLinear;
   const y2Scale = y2Type(y2Domain, yRange);
   const y2 = d3
@@ -148,7 +145,7 @@ export function BarAndLineChart(
         .attr("y", 10)
         .attr("fill", "currentColor")
         .attr("text-anchor", "end")
-        .text(`↑ Number of SE Licenses Granted`)
+        .text(`↑ Number of Active SE License Holders`)
     );
 
   const bar = svg
@@ -162,7 +159,7 @@ export function BarAndLineChart(
     .attr("y", (d) => y2(d.count))
     .attr("height", (d) => y2(0) - y2(d.count))
     .append("title")
-    .text((d) => `Active Licenses: ${d.count}`);
+    .text((d) => `Active Unique License Holders: ${d.count}`);
 
   const path = svg
     .append("g")

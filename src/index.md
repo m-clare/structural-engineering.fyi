@@ -1,24 +1,10 @@
 ```js
 import { stateChoropleth } from './components/stateChoropleth.js'
 import { StackedBarChart } from './components/StackedBarChart.js'
+import { UpsetPlot } from './components/UpsetPlot.js'
+import { BarAndLineChart } from './components/BarAndLineChart.js'
+import { Swatches } from './components/Swatches.js'
 ```
-<div class="hero">
-  <h1>Structural Engineering.fyi</h1>
-  <h2>There are ${activeCount} Practicing Engineers</h2>
-  <h2>with Structural Engineering Licenses*</h2>
-</div>
-
-*Individuals licensed as a "structural engineer", in addition to  "professional engineer" in all states other than Illinois and Hawaii, where the "structural engineer" qualification supercedes the initial "professional engineer" license. This additional license typically requires additional depth and breadth exams in gravity and lateral design for buildings and bridges (currently 21 hours of additional testing).
-
-# SE Licensee State of Origin
-```js
-stateChoropleth(originStateCounts, states)
-```
-
-Of the ${activeCount} licensed structural engineers, this choropleth map indicates their distribution across the country. States denoted with a "Partial Practice Act", or "Full Practice Act" are where the licensure data has been aggregated and deduplicated from, but engineers from any state can be licensed as an SE in those 10 states. 
-
-${unknownLicenseCount} licensees "state of origin" is undocumented as they maintain an SE License only in Hawaii, hence the low count in HI despite the "Full Practice Act" in effect in that state (see [Aggregation Methodology](#aggregation-methodology)). Only ${originStateCounts.filter((state) => state.state == "HI")[0].count} structural engineers that live in Hawaii maintain an SE license outside of Hawaii.
-
 
 ```js
 // Load data files
@@ -26,6 +12,9 @@ const stateFips = FileAttachment("./data/stateFips.json").json()
 const states = FileAttachment("./data/states-albers-10m.json").json()
 const originStates = FileAttachment("state-count.json").json()
 const stateByYear = FileAttachment("state-by-year.json").json()
+const stateLicenses = FileAttachment("state-license-count.json").json()
+const licensesByLicensee = FileAttachment("licenses-by-licensee-count.json").json()
+const licenseAge = FileAttachment("license-age.json").json()
 
 const stateReqs = {
  "Partial Practice Act": {states: ['CA', 'NV', 'OR', 'UT', 'WA', 'AK', 'OK', 'GA'], color: '#e2da4e'},
@@ -34,6 +23,193 @@ const stateReqs = {
  "Roster Designation": {states: ['ME', 'VT', 'NH', 'MA', 'DE', 'MN', 'SD', 'WY', 'AZ', 'NM', 'TX', 'LA', 'AL'], color: '#012a9c'},
  default: { color: '#8ba8c5' }
 }
+```
+
+<div class="hero">
+  <h1>Structural Engineering.fyi</h1>
+  <h2>There are ${activeCount} Practicing Engineers</h2>
+  <h2>with Structural Engineering Licenses*</h2>
+</div>
+
+*Individuals licensed as a "structural engineer". In states other than Illinois and Hawai, a "professional engineer" license must be obtained before pursuing the SE license. The SE license requires [additional depth and breadth exams](https://ncees.org/exams/pe-exam/cbt-structural/) in gravity and lateral design for buildings and bridges (currently 21 hours of additional computer-based testing).
+
+## Motivation
+This website provides insight into the state of licensure within the profession of structural engineering. The "professional engineer" license has been accepted for decades in many states as the standard for the design of buildings and bridges. 
+
+However, several professional organizations and governing bodies have pushed for further adopting of advanced qualification based on the structural engineering exam, now confusingly called the PE Structural (engineers are currently qualified to practice structural engineering in 30 states from taking the PE Civil: Structural exam, a single 8 hour test). To my knowledge, no one has compared license data across all the ten SE licensed states to determine how many practicing SEs there are and what the trends have been in licensure over the past 60 years. I previously took a look at data in a [few states](https://mclare.blog/posts/is-the-structural-engineering-profession-growing/) where it was easy to get licensure data, but decided to revisit this idea with more refined data processing and analysis.
+
+### Active SE Licenses By State 
+```js
+stateChoropleth(licenseStateCounts, states)
+```
+
+
+Of the ${activeLicenseCount} unique licensed structural engineers, this choropleth map indicates all active licenses across the country (no deduplication based on individuals holding licenses in multiple states). States denoted with a "Partial Practice Act", or "Full Practice Act" are where the licensure data has been gathered from (see [Notes](#notes)). 
+
+## Key Findings
+Here are some key takeaways from a deep dive into the data.
+
+- At least 5% of active practicing SE licensed engineers have never taken the advanced qualification exam. This is due to legislation in [Utah in 2008](https://trackbill.com/bill/utah-senate-bill-200-professional-engineers-licensing-amendments/380377/) and legislation in [Georgia in 2020](https://seaog.org/news.php?id=13) allowing engineers to apply for licensure based on experience rather than test outcomes.  While they may not be able to get comity in other states at this point, they are still qualified SEs according to the licensing board. After noticing anomolous peaks in the data from looking at license statistics by state, I was able to find the supporting legislation changes.
+
+```js
+const statusColors = ["#377eb8", "#e41a1c", "#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628","#f781bf","#999999"]
+```
+
+### UT New/Comity Licenses by Year Awarded
+```js
+Swatches(d3.scaleOrdinal(["New", "Reciprocal"], statusColors.slice(0, 2)))
+```
+```js
+const filteredUTData = stateByYear["license_type"].filter((entry) => entry.state === "UT")
+const filledUTData = fillDataGaps(filteredUTData, "UT", "license_type", ["New", "Reciprocal"])
+
+display(StackedBarChart(filledUTData, {
+  x: (d) => d.year,
+  y: (d) => d.count,
+  z: (d) => d.status,
+  yLabel: "Number of UT New/Comity Licenses",
+  colors: statusColors.slice(0, 2),
+  height: 250
+}));
+```
+### GA New/Comity Licenses by Year Awarded
+```js
+Swatches(d3.scaleOrdinal(["New", "Reciprocal"], statusColors.slice(0, 2)))
+```
+
+```js
+const filteredGAData = stateByYear["license_type"].filter((entry) => entry.state === "GA")
+const filledGAData = fillDataGaps(filteredGAData, "GA", "license_type", ["New", "Reciprocal"])
+
+display(StackedBarChart(filledGAData, {
+  x: (d) => d.year,
+  y: (d) => d.count,
+  z: (d) => d.status,
+  yLabel: "Number of GA New/Comity Licenses",
+  colors: statusColors.slice(0, 2),
+  height: 250
+}));
+```
+
+- 28% of active licensed SEs are licensed only in Hawaii. I believe under old testing guidelines, Hawaii granted licenses to individuals if they had passed the first of two parts of the old exam. It's unclear if today someone who qualified this way still needs to make this distinction. Anecdotally, I remember a supervising engineer early in my career complaining that he had to denote he'd only passed the SE I in Hawaii on his business cards. The high proportion of licensed individuals in Hawaii is also likely due to their lack of continuing education requirements (Illinois, the only other full practice state, does require continuing education).
+
+- The current average (and median) "age" of an SE license is 15 years old. Assuming that most licensed individuals are passing the exam in their late 20s/early 30s after acquiring the required years of experience, this would make the average license holder around 45 years old. There have been two dips in the average age thanks to the grandfathering clauses mentioned above, but in general, the average age has only been increasing (which indicates that there is no steady state of people exiting and entering the profession).
+
+### Number of Active Licensed Professionals Over Time and Average "Age" of a License
+
+```js
+function getStats(licenses) {
+   // process active Licensees
+   const activeLicensees = Object.values(licenses).filter((license) => license.active === true && license.license_date !== undefined).map((license) => {
+     const date = new Date(Date.parse(license.license_date))
+     return {'licenseYear': date.getFullYear()}
+   })
+   
+   // process expired licensees 
+   const expiredLicensees = Object.values(licenses).filter((license) => license.active === undefined && license.expiration_date !== undefined && license.license_date !== undefined).map((license) => ({'licenseYear': (new Date(Date.parse(license.license_date))).getFullYear(), 'expYear': (new Date(Date.parse(license.expiration_date)).getFullYear())}))
+   
+   const licenseYears = (activeLicensees.map((license) => license.licenseYear)).concat( expiredLicensees.map((license) => license.licenseYear))
+   const minYear = d3.min(licenseYears)
+   const maxYear = d3.max(licenseYears)
+   let statsSummary = []
+   let yearSummary = {}
+   for (let i = minYear; i <= maxYear; i++) {
+     const active = activeLicensees.filter((license) => license.licenseYear <= i)
+     const expired = expiredLicensees.filter((license) => license.licenseYear <= i && license.expYear >= i)
+     const count = active.length + expired.length 
+     const validYears = (active.map(license => license.licenseYear)).concat(expired.map(license => license.licenseYear))
+     const mean = d3.mean(validYears.map((year) => i - year))
+     const median = d3.median(validYears.map((year) => i - year))
+     statsSummary.push({year: i, count, mean, median})
+     yearSummary[i] = validYears 
+
+    }
+    return {overallSummary: statsSummary, yearSummary, yearSet: [minYear, maxYear]}
+}
+
+const stats = getStats(licenseAge)
+```
+
+<div>
+  ${resize((width) => BarAndLineChart(stats.overallSummary, 'SE', {
+  x: (d) => d.year,
+  y: (d) => d.mean,
+  z: (d) => d.status,
+  yLabel: `↑ Average "Age" of SE License`,
+  title: (d) => `${d.year} - ${Math.round(d.mean)} years`,
+  xType: d3.scaleBand,
+  width: width,
+  height: 600,
+  color: "currentColor"
+}))}
+</div>
+
+- The data quality around licensure expiration is not great (and probably shouldn't be trusted for licenses prior to 1990), but I was curious if there are any visible trends in how many years a license holder maintains at least one license before letting it lapse. Prior to 2000, this seemed to follow a bell curve, but in more recent years, the distribution has skewed right, with more people failing to renew any SE license after less than 15 years of maintaining it. This may also be due to some of those single license holders unable to achieve comity without additional (21 hour) testing choosing not to renew as well.
+
+### Years of Experience Before Non-renewal of SE License
+```js 
+
+function getExpiredStats(licenses) {
+  const expiredLicensees = Object.values(licenses).filter((license) => license.active === undefined && license.expiration_date !== undefined && license.license_date !== undefined).map((license) => ({...license, 'licenseYear': (new Date(Date.parse(license.license_date))).getFullYear(), 'expYear': (new Date(Date.parse(license.expiration_date)).getFullYear())})).filter((license) => license.expYear > license.licenseYear)
+  
+  const licenseYears = expiredLicensees.map((license) => license.licenseYear)
+  const minYear = d3.min(licenseYears)
+  const maxYear = d3.max(licenseYears)
+  let yearSummary = {}
+  for (let i = minYear; i <= maxYear; i++) {
+    
+    const expired = expiredLicensees.filter((license) => license.licenseYear <= i && license.expYear <= i)
+    const count = expired.length 
+    const licenseAgeAtExp = Object.entries(Object.fromEntries(d3.rollup(expired.map((licensee) => licensee.expYear - licensee.licenseYear), v => v.length, d => d))).map((entry) => ({yearsOfExp: parseInt(entry[0]), count: entry[1]}))
+    if (licenseAgeAtExp.length > 0) {
+      yearSummary[i.toString()] = licenseAgeAtExp
+    }
+  }
+  
+  return yearSummary
+}
+const expStats = getExpiredStats(licenseAge)
+```
+```js
+const expYearRange = [d3.min(Object.keys(expStats)), d3.max(Object.keys(expStats))]
+const selectedExpYear = view(Inputs.range(expYearRange, {step: 1, label: "Year of Interest", value: 2024})
+)
+```
+```js
+const selectedSummary = expStats[selectedExpYear]
+```
+
+```js
+Plot.plot({
+  x: {padding: 0.1, tickFormat: (d, i) => {
+    if (selectedSummary.length > 80) {
+      return i % 5 === 0 ? d.toString() : ""
+    } else {
+      return d.toString()
+    }
+  }},
+  y: { tickFormat: (d, i) => parseInt(d) },
+  width,
+  marks: [
+    Plot.barY(selectedSummary, {x: "yearsOfExp", y: "count", fill: "#e41a1c"})
+  ]
+})
+```
+
+## Supporting Interactive Plots
+
+### State of Residence for SE Licensees based on Partial/Full Practice
+
+Choose a state from the dropdown to show where licensed engineers for that state (e.g. a SE licensed in CA) live.
+```js
+const selectedLicenseState = view(Inputs.select(
+  ["AK", "CA", "GA", "IL", "OK", "OR", "UT", "WA", "NV"],
+  { label: "Select a state" }
+))
+```
+ 
+```js
+stateChoropleth(licenseStateOriginCounts, states)
 ```
 
 ```js
@@ -50,8 +226,11 @@ const getStateReqs = (state, mapping) => {
 ```
 
 ```js
-const originStateCounts = originStates.map((entry) => ({state: entry["origin_state"], count: entry["count"], designation: getStateReqs(entry["origin_state"], stateReqs), stateFips: stateFips[entry["origin_state"]] ?? null}))
-const unknownLicenseCount = originStateCounts.filter((entry) => entry.stateFips == null).map(entry => entry.count).reduce((a, b) => a + b, 0)
+
+const licenseStateCounts = Object.keys(stateFips).map((state) => ({state: state, count: stateLicenses.find((d) => d.license_state === state) ? stateLicenses.find((d) => d.license_state === state).count : null, designation: getStateReqs(state, stateReqs), stateFips: stateFips[state]}))
+const activeLicenseCount = Object.keys(licensesByLicensee).length
+const licenseStateOriginCounts = originStates.filter((entry) => entry.license_state === selectedLicenseState && entry.origin_state !== null).map((state) => ({...state, designation: getStateReqs(state.origin_state, stateReqs), stateFips: stateFips[state.origin_state]}))
+
 const activeCount = (async function* (numActive, numSteps = 100) {
   const stepSize = Math.ceil(numActive / numSteps);
   for (let activeCount = 0; activeCount <= numActive; activeCount += stepSize) {
@@ -66,14 +245,13 @@ const activeCount = (async function* (numActive, numSteps = 100) {
   if ((activeCount  % stepSize) !== 0) {
     yield numActive;
   }
-})(originStateCounts.map(entry => entry.count).reduce((a, b) => a + b, 0), 50)
+})(activeLicenseCount, 50)
 ```
-# Licenses Awarded Per Year 
-
+### Licenses Awarded Per Year 
 ```js
 const selectedState = view(Inputs.select(
   ["AK", "CA", "GA", "HI", "IL", "OK", "OR", "UT", "WA"],
-  { label: "Select a state" }
+  { label: "Select a state", value: "IL" }
 ))
 
 const selectedMetric = view(Inputs.select(
@@ -84,12 +262,16 @@ const selectedMetric = view(Inputs.select(
 ```
 
 ```js
+Swatches(d3.scaleOrdinal(selectedStatuses, statusColors.slice(0, 2)))
+```
 
-function fillDataGaps(licenses, state, metric) {
-  const statuses = metric === "active_status" 
+```js
+
+const selectedStatuses = selectedMetric === "active_status" 
     ? ["Active", "Inactive"] 
     : ["New", "Reciprocal"];
-  
+    
+function fillDataGaps(licenses, state, metric, statuses) { 
   // Get all years from the data
   const existingYears = new Set(licenses.map((d) => d.year).filter((d) => d != null));
   
@@ -126,41 +308,114 @@ function fillDataGaps(licenses, state, metric) {
 }
 
 const filteredData = stateByYear[selectedMetric].filter((entry) => entry.state === selectedState)
-const filledData = fillDataGaps(filteredData, selectedState, selectedMetric)
-```
-```js
-filledData
-```
+const filledData = fillDataGaps(filteredData, selectedState, selectedMetric, selectedStatuses)
 
-```js
 display(StackedBarChart(filledData, {
   x: (d) => d.year,
   y: (d) => d.count,
   z: (d) => d.status,
-  yLabel: "Number of Licenses"
+  yLabel: "Number of Licenses",
+  colors: statusColors.slice(0, selectedStatuses.length)
 }));
 ```
 
-
 The above dropdowns allow you to toggle between different states as well as a stacked bar presentation of active vs. inactive licenses per year, or how many licenses awarded per year in each state are comity licenses (i.e. an existing licensee getting a new license in a different state).
 
-# Cumulative Number of Licensed Professionals Over Time and Average "Age" of a License
-# Most Common License Combinations
-# Aggregation Methodology
 
-This site utilizes licensure data for the following ten states (where the SE is a recognized license), as of December 1, 2025.
-- Alaska
-- California
-- Georgia
-- Hawaii
-- Illinois 
-- Nevada
-- Oklahoma 
-- Oregon 
-- Utah 
-- Washington
+### Distribution of License "Age" Over the Years
+```js
+const yearOfInterest = view(Inputs.form([
+  Inputs.range(stats.yearSet, {step: 1, label: "Year of Interest", value: 2025})
+]))
+```
 
-There is significant discrepancy in what data each state provides for each licensee. Most states include the following data (which is used in the graphics above):
+```js
+function licensesByYear() {
+  const range = d3.range(stats.yearSet[0], stats.yearSet[1])
+  const valueMap = d3.rollup(stats.yearSummary[yearOfInterest], v => v.length, d => d)
+  const output = []
+  range.forEach((value) => {
+    output.push({year: value, count: valueMap.get(value) ?? 0})
+  })
+  return output
+}
+const yearCount = (licensesByYear()).filter((entry) => entry.year <= yearOfInterest)
+```
+
+```js
+Plot.plot({
+  x: {padding: 0.1, tickFormat: (d, i) => {
+    if (yearCount.length > 20) {
+      return i % 5 === 0 ? d.toString() : ""
+    } else {
+      return d.toString()
+    }
+  }},
+  y: { tickFormat: (d, i) => parseInt(d) },
+  width,
+  marks: [
+    Plot.barY(yearCount, {x: "year", y: "count", fill: "steelblue"})
+  ]
+})
+```
+
+### Most Common License Combinations
+This [upset plot](https://en.wikipedia.org/wiki/UpSet_plot) is as an advanced Venn diagram for showing intersections of multiple sets. In this case it shows which combinations of licenses are the most common for licensees that actively hold SE licenses in multiple states.
+
+```js
+function processSourceStates(data) {
+  // Create a map to track state occurrences and related data
+  const stateSetCombinations = {}
+  const stateAbbrevSet = new Set()
+  const dataSet = Object.values(data)
+  
+  // Process each record
+  dataSet.forEach(record => {
+  // data.forEach(record => {
+    // Split source states and trim whitespace
+    const stateSetKey = record.sort().join("-")
+    if (!stateSetCombinations[stateSetKey]) {
+       const states = Array.from(new Set(stateSetKey.split("-")))
+       states.forEach((state) => stateAbbrevSet.add(state))
+       stateSetCombinations[stateSetKey] = {size: 0, set: states}
+    }
+    
+    stateSetCombinations[stateSetKey].size += 1
+  })
+  
+  const values = Object.values(stateSetCombinations)
+  return {
+   sets: Array.from(stateAbbrevSet).sort(),
+   intersections: values.sort((a, b) => b.size - a.size)
+  } 
+  }
+```
+
+```js
+const individualLicenseData = processSourceStates(licensesByLicensee)
+```
+
+```js
+html`<div style="overflow-x: auto; max-width: 100%;">${UpsetPlot(individualLicenseData)}</div>`
+```
+
+## Aggregation Methodology
+Significant effort has been made to properly deduplicate license data to identify individuals holding licenses in multiple states. This [script](https://github.com/m-clare/structural-engineering.fyi/tree/main/src/assets) was created to normalize the data and match individuals with a degree of certainty (low/medium/high/singleton) based on their full names and origin states. All data presented here has been anonymized to avoid exposing personal information.
+
+## Other Notes
+This site utilizes data from the licensure board for the following ten states (where the SE is a recognized license), as of December 1, 2025.
+- [Alaska](https://www.commerce.alaska.gov/cbp/main/)
+- [California](https://www.bpelsg.ca.gov/)
+- [Georgia](https://pels.georgia.gov/)
+- [Hawaii](https://cca.hawaii.gov/pvl/)
+- [Illinois](https://idfpr.illinois.gov/)
+- [Nevada](https://nvbpels.org/)
+- [Oklahoma](https://oklahoma.gov/pes.html)
+- [Oregon](https://www.oregon.gov/OSBEELS/Pages/default.aspx)
+- [Utah](https://dopl.utah.gov/engineering/)
+- [Washington](https://brpels.wa.gov/)
+
+There is significant discrepancy in what data each state provides for each license holder. Most states include the following fields (used to analyze the data and generate the plots above):
 - date of licensure 
 - license validity (active/non-active)
 - license expiration date 
@@ -170,10 +425,11 @@ Exceptions:
 - Nevada - no date of licensure (cannot use NV only licenses in cumulative count graphic, or Licenses By State)
 - Hawaii - no state of origin (cannot include HI only licensees in state of origin graphic)
 
+Passing the 21 hour exam (broken into 4 parts) does not automatically qualify an indvidual to be licensed in one of the ten Partial/Full Practice states. Some states require practicing as a PE for X number of years under a licensed SE before sitting the exam. Others require proof of significant structural experience (down to the seismic design category of a project) to qualify.
 
-# Other Notes
+## Disclaimer
 
-
+Spite Driven Development assumes no responsibility or liability for any errors or omissions in the content of this site. All information is provided on an "as is" basis with no guarantee of completeness, accuracy, usefulness, or of the results obtained from the use of this information. All inquires can be directed to mclare(at)utsv.net.
 
 <style>
 .hero {
@@ -220,16 +476,20 @@ figure > * {
   width: 90%;
 }
 
-h1 {
-  max-width: 800px;
-}
-
 <!-- #observablehq-footer { -->
 <!--   display: none; -->
 <!-- } -->
 
-p {
+p, ul, li, h1, h2, h3, h4, h5 {
   max-width: 100%;
+}
+
+h3 {
+	color: var(--theme-foreground);
+	font-size: 20px;
+	font-style: italic;
+	font-weight: normal;
+	margin-bottom: 1rem;
 }
 
 

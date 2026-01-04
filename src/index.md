@@ -31,7 +31,7 @@ const stateReqs = {
   <h2>with Structural Engineering Licenses*</h2>
 </div>
 
-*Individuals licensed as a "structural engineer". In states other than Illinois and Hawai, a "professional engineer" license must be obtained before pursuing the SE license. The SE license requires [additional depth and breadth exams](https://ncees.org/exams/pe-exam/cbt-structural/) in gravity and lateral design for buildings and bridges (currently 21 hours of additional computer-based testing).
+<div class="note">*Individuals licensed as a "structural engineer". The SE license requires <a href="https://ncees.org/exams/pe-exam/cbt-structural">additional depth and breadth exams</a> in gravity and lateral design for buildings and bridges (currently 21 hours of additional computer-based testing).</div>
 
 ## Motivation
 This website provides insight into the state of licensure within the profession of structural engineering. The "professional engineer" license has been accepted for decades in many states as the standard for the design of buildings and bridges. 
@@ -43,13 +43,13 @@ However, several professional organizations and governing bodies have pushed for
 stateChoropleth(licenseStateCounts, states)
 ```
 
+There are ${activeLicenseCount} unique licensed structural engineers, who maintain ${totalLicenseCount} active licenses across 10 states. States denoted with a "Partial Practice Act", or "Full Practice Act" are where the licensure data has been gathered from (see [Other Notes](#other-notes)). 
 
-Of the ${activeLicenseCount} unique licensed structural engineers, this choropleth map indicates all active licenses across the country (no deduplication based on individuals holding licenses in multiple states). States denoted with a "Partial Practice Act", or "Full Practice Act" are where the licensure data has been gathered from (see [Notes](#notes)). 
 
 ## Key Findings
 Here are some key takeaways from a deep dive into the data.
 
-- At least 5% of active practicing SE licensed engineers have never taken the advanced qualification exam. This is due to legislation in [Utah in 2008](https://trackbill.com/bill/utah-senate-bill-200-professional-engineers-licensing-amendments/380377/) and legislation in [Georgia in 2020](https://seaog.org/news.php?id=13) allowing engineers to apply for licensure based on experience rather than test outcomes.  While they may not be able to get comity in other states at this point, they are still qualified SEs according to the licensing board. After noticing anomolous peaks in the data from looking at license statistics by state, I was able to find the supporting legislation changes.
+- __At least 5% of active practicing SE licensed engineers have never taken the advanced qualification exam.__ This is due to legislation in [Utah in 2008](https://trackbill.com/bill/utah-senate-bill-200-professional-engineers-licensing-amendments/380377/) and legislation in [Georgia in 2020](https://seaog.org/news.php?id=13) allowing engineers to apply for licensure based on experience rather than test outcomes.  While they may not be able to get comity in other states at this point, they are still qualified SEs according to the licensing board. After noticing anomolous peaks in the data from looking at license statistics by state, I was able to find the supporting legislation changes.
 
 ```js
 const statusColors = ["#377eb8", "#e41a1c", "#4daf4a","#984ea3","#ff7f00","#ffff33","#a65628","#f781bf","#999999"]
@@ -91,9 +91,9 @@ display(StackedBarChart(filledGAData, {
 }));
 ```
 
-- 28% of active licensed SEs are licensed only in Hawaii. I believe under old testing guidelines, Hawaii granted licenses to individuals if they had passed the first of two parts of the old exam. It's unclear if today someone who qualified this way still needs to make this distinction. Anecdotally, I remember a supervising engineer early in my career complaining that he had to denote he'd only passed the SE I in Hawaii on his business cards. The high proportion of licensed individuals in Hawaii is also likely due to their lack of continuing education requirements (Illinois, the only other full practice state, does require continuing education).
+- __28% of active licensed SEs are licensed only in Hawaii.__ I believe under old testing guidelines, Hawaii granted licenses to individuals if they had passed the first of two parts of the old exam. It's unclear if today someone who qualified this way still needs to make this distinction. Anecdotally, I remember a supervising engineer early in my career complaining that he had to denote he'd only passed the SE I in Hawaii on his business cards. The high proportion of licensed individuals in Hawaii is also likely due to their lack of continuing education requirements (Illinois, the only other full practice state, does require continuing education).
 
-- The current average (and median) "age" of an SE license is 15 years old. Assuming that most licensed individuals are passing the exam in their late 20s/early 30s after acquiring the required years of experience, this would make the average license holder around 45 years old. There have been two dips in the average age thanks to the grandfathering clauses mentioned above, but in general, the average age has only been increasing (which indicates that there is no steady state of people exiting and entering the profession).
+- __The current average (and median) "age" of an SE license is 15 years old.__ Assuming that most licensed individuals are passing the exam in their late 20s/early 30s after acquiring the required years of experience, this would make the average license holder around 45 years old. There have been two dips in the average age thanks to the grandfathering clauses mentioned above, but in general, the average age has only been increasing (which indicates that there is no steady state of people exiting and entering the profession).
 
 ### Number of Active Licensed Professionals Over Time and Average "Age" of a License
 
@@ -144,9 +144,14 @@ const stats = getStats(licenseAge)
 }))}
 </div>
 
-- The data quality around licensure expiration is not great (and probably shouldn't be trusted for licenses prior to 1990), but I was curious if there are any visible trends in how many years a license holder maintains at least one license before letting it lapse. Prior to 2000, this seemed to follow a bell curve, but in more recent years, the distribution has skewed right, with more people failing to renew any SE license after less than 15 years of maintaining it. This may also be due to some of those single license holders unable to achieve comity without additional (21 hour) testing choosing not to renew as well.
+- The data quality around licensure expiration is not great (and probably shouldn't be trusted for licenses prior to 1990), but I was curious if there are any visible trends in how many years a license holder maintains at least one license before letting it lapse. Prior to 2000, this seemed to follow a bell curve, but in more recent years, the distribution has skewed right, with __more people failing to renew any SE license after less than 15 years of maintaining it.__ This may also be due to some of those single license holders unable to achieve comity without additional (21 hour) testing choosing not to renew as well.
 
-### Years of Experience Before Non-renewal of SE License
+### Years of Experience Before Non-renewal of Any SE License
+
+<div class="note">
+This is based on unique license data tracking when individuals no longer renew any of their previously maintained SE licenses</div>
+
+
 ```js 
 
 function getExpiredStats(licenses) {
@@ -182,7 +187,7 @@ const selectedSummary = expStats[selectedExpYear]
 ```js
 Plot.plot({
   x: {padding: 0.1, tickFormat: (d, i) => {
-    if (selectedSummary.length > 80) {
+    if (selectedSummary.length > 40) {
       return i % 5 === 0 ? d.toString() : ""
     } else {
       return d.toString()
@@ -230,6 +235,7 @@ const getStateReqs = (state, mapping) => {
 const licenseStateCounts = Object.keys(stateFips).map((state) => ({state: state, count: stateLicenses.find((d) => d.license_state === state) ? stateLicenses.find((d) => d.license_state === state).count : null, designation: getStateReqs(state, stateReqs), stateFips: stateFips[state]}))
 const activeLicenseCount = Object.keys(licensesByLicensee).length
 const licenseStateOriginCounts = originStates.filter((entry) => entry.license_state === selectedLicenseState && entry.origin_state !== null).map((state) => ({...state, designation: getStateReqs(state.origin_state, stateReqs), stateFips: stateFips[state.origin_state]}))
+const totalLicenseCount = licenseStateCounts.map((entry) => entry.count).reduce((a, b) => a + b, 0)
 
 const activeCount = (async function* (numActive, numSteps = 100) {
   const stepSize = Math.ceil(numActive / numSteps);
@@ -318,11 +324,11 @@ display(StackedBarChart(filledData, {
   colors: statusColors.slice(0, selectedStatuses.length)
 }));
 ```
+<div class="note">
+The above dropdowns allow you to toggle between different states as well as a stacked bar presentation of active vs. inactive licenses per year, or how many licenses awarded per year in each state are comity/reciprocal licenses (i.e. an existing licensee getting a new license in a different state). This data is based on each state's records and has not been deduplicated against individuals (other than to determine if a license is a new or reciprocal).
+</div>
 
-The above dropdowns allow you to toggle between different states as well as a stacked bar presentation of active vs. inactive licenses per year, or how many licenses awarded per year in each state are comity licenses (i.e. an existing licensee getting a new license in a different state).
-
-
-### Distribution of License "Age" Over the Years
+### Distribution of Oldest License Per Active Licensed Individual Over the Years
 ```js
 const yearOfInterest = view(Inputs.form([
   Inputs.range(stats.yearSet, {step: 1, label: "Year of Interest", value: 2025})
@@ -341,6 +347,7 @@ function licensesByYear() {
 }
 const yearCount = (licensesByYear()).filter((entry) => entry.year <= yearOfInterest)
 ```
+<div class="note">This plot includes active licenses based on the year of interest, i.e. an individual's latest expired license date is considered for adding and removing counts from the plot.</div>
 
 ```js
 Plot.plot({
@@ -480,7 +487,7 @@ figure > * {
 <!--   display: none; -->
 <!-- } -->
 
-p, ul, li, h1, h2, h3, h4, h5 {
+p, ul, li, h1, h2, h3, h4, h5, .note {
   max-width: 100%;
 }
 

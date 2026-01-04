@@ -436,7 +436,7 @@ Passing the 21 hour exam (broken into 4 parts) does not automatically qualify an
 
 #### Known Data Quality Issues
 - Illinois has a default license date of 1997-01-01 for licenses where it lacks effective/expiration dates (all show up as "inactive")
-- Just about state has a few licenses that are marked as "active" but may lack licensure dates/expiration dates, probably from bad record keeping
+- Just about every state has a few licenses that are marked as "active" but may lack licensure dates/expiration dates, probably from bad record keeping
 
 ## Disclaimer
 
